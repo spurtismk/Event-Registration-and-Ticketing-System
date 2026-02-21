@@ -1,0 +1,43 @@
+# Example cURL Commands
+
+## 1. Register User (Organizer)
+```bash
+curl -X POST http://localhost:8080/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Admin John", "email": "admin@events.com", "password": "securepassword", "role": "ADMIN"}'
+```
+
+## 2. Login User
+```bash
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@events.com", "password": "securepassword"}'
+  
+# Extract the token from response and export it
+# export TOKEN="your_jwt_token_here"
+```
+
+## 3. Create Event (Requires Organizer or Admin ROLE)
+```bash
+curl -X POST http://localhost:8080/organizer/events \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Go Concurrency Workshop", "description": "Learn go routines.", "event_date": "2026-12-31T15:00:00Z", "capacity": 5}'
+  
+# Output will show the event ID. Export it.
+# export EVENT_ID="the-uuid"
+```
+
+## 4. Publish Event
+```bash
+curl -X POST http://localhost:8080/organizer/events/$EVENT_ID/publish \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+## 5. Run Concurrency Simulation (100 Concurrent Users!)
+```bash
+# Requires ADMIN role!
+curl -X POST "http://localhost:8080/admin/events/$EVENT_ID/simulate?users=100" \
+  -H "Authorization: Bearer $TOKEN"
+```
+The output will show exact metrics of success registration vs waitlisted vs failed, demonstrating PostgreSQL pessimistic locking working flawlessly under stress!
